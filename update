@@ -1,0 +1,9 @@
+#!/bin/bash
+
+OS_DIR="`sw_vers -productVersion`"
+mkdir "$OS_DIR" && cd "$OS_DIR" &&
+find /System/Library/{,Private}Frameworks -maxdepth 1 -mindepth 1 -print0 | xargs -0 -n1 -P10 bash -c '
+	name="$(basename ${0%.framework})"
+	otool -tV "$0/$name" | c++filt > "$name".asm
+	mkdir -p Headers/"$name" && cd Headers/"$name" && class-dump -H "$0"
+'
